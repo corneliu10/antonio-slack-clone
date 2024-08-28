@@ -1,7 +1,7 @@
-import { Button } from '@/components/ui/button';
+import { AuthScreen } from '@/features/auth/components/auth-screen';
 
 const HomePage = () => {
-  return <Button>Click Me</Button>;
+  return <AuthScreen />;
 };
 
 export default HomePage;
