@@ -10,8 +10,14 @@ import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { FaGithub } from 'react-icons/fa';
 import { FcGoogle } from 'react-icons/fc';
+import { SignInFlow } from '../types';
 
-export const SignInCard = () => {
+interface SignInCardProps {
+  // eslint-disable-next-line no-unused-vars
+  setState: (state: SignInFlow) => void;
+}
+
+export const SignInCard = ({ setState }: SignInCardProps) => {
   return (
     <Card className="h-full w-full p-8">
       <CardHeader className="px-0 pt-0">
@@ -72,7 +78,10 @@ export const SignInCard = () => {
         </div>
         <p className="text-xs text-muted-foreground">
           Don&apos;t have an account?{' '}
-          <span className="cursor-pointer text-sky-700 hover:underline">
+          <span
+            onClick={() => setState('signUp')}
+            className="cursor-pointer text-sky-700 hover:underline"
+          >
             Sign up
           </span>
         </p>
