@@ -1,6 +1,17 @@
-import { convexAuthNextjsMiddleware } from '@convex-dev/auth/nextjs/server';
+import {
+  convexAuthNextjsMiddleware,
+  createRouteMatcher,
+  isAuthenticatedNextjs,
+  nextjsMiddlewareRedirect,
+} from '@convex-dev/auth/nextjs/server';
 
-export default convexAuthNextjsMiddleware();
+const isPublicPage = createRouteMatcher(['/signin']);
+
+export default convexAuthNextjsMiddleware((request) => {
+  if (!isPublicPage(request) && isAuthenticatedNextjs()) {
+    return nextjsMiddlewareRedirect(request, '/signin');
+  }
+});
 
 export const config = {
   // The following matcher runs middleware on all routes
