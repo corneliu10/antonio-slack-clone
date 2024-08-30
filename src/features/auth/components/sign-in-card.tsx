@@ -24,9 +24,13 @@ export const SignInCard = ({ setState }: SignInCardProps) => {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [pending, setPending] = useState(false);
 
   const handleProviderSignIn = (value: 'github' | 'google') => {
-    signIn(value);
+    setPending(true);
+    signIn(value).finally(() => {
+      setPending(false);
+    });
   };
 
   return (
@@ -58,7 +62,7 @@ export const SignInCard = ({ setState }: SignInCardProps) => {
           <Button
             type="submit"
             size="lg"
-            disabled={false}
+            disabled={pending}
             className="w-full"
           >
             Continue
@@ -70,7 +74,7 @@ export const SignInCard = ({ setState }: SignInCardProps) => {
             onClick={() => handleProviderSignIn('google')}
             variant="outline"
             size="lg"
-            disabled={false}
+            disabled={pending}
             className="relative w-full"
           >
             <FcGoogle className="absolute left-2.5 top-3 size-5" />
@@ -80,7 +84,7 @@ export const SignInCard = ({ setState }: SignInCardProps) => {
             onClick={() => handleProviderSignIn('github')}
             variant="outline"
             size="lg"
-            disabled={false}
+            disabled={pending}
             className="relative w-full"
           >
             <FaGithub className="absolute left-2.5 top-3 size-5" />
