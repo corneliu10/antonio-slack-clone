@@ -8,6 +8,8 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
+import { useAuthActions } from '@convex-dev/auth/react';
+import { TriangleAlert } from 'lucide-react';
 import { useState } from 'react';
 import { FaGithub } from 'react-icons/fa';
 import { FcGoogle } from 'react-icons/fc';
@@ -19,9 +21,38 @@ interface SignUpCardProps {
 }
 
 export const SignUpCard = ({ setState }: SignUpCardProps) => {
+  const { signIn } = useAuthActions();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState('');
+  const [pending, setPending] = useState(false);
+
+  const handlePasswordSignUp = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (password !== confirmPassword) {
+      setError('Password do not match');
+      return;
+    }
+
+    setPending(true);
+    signIn('password', { email, password, flow: 'signUp' })
+      .catch(() => {
+        setError('Something went wrong.');
+      })
+      .finally(() => {
+        setPending(false);
+      });
+  };
+
+  const handleProviderSignUp = (value: 'github' | 'google') => {
+    setPending(true);
+    signIn(value).finally(() => {
+      setPending(false);
+    });
+  };
 
   return (
     <Card className="h-full w-full p-8">
@@ -31,10 +62,19 @@ export const SignUpCard = ({ setState }: SignUpCardProps) => {
           Use your email or another service to continue
         </CardDescription>
       </CardHeader>
+      {!!error && (
+        <div className="mb-6 flex items-center gap-x-2 rounded-md bg-destructive/15 p-3 text-sm text-destructive">
+          <TriangleAlert className="size-4" />
+          <p>{error}</p>
+        </div>
+      )}
       <CardContent className="space-y-5 px-0 pb-0">
-        <form className="space-y-2.5">
+        <form
+          onSubmit={handlePasswordSignUp}
+          className="space-y-2.5"
+        >
           <Input
-            disabled={false}
+            disabled={pending}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Email"
@@ -42,7 +82,7 @@ export const SignUpCard = ({ setState }: SignUpCardProps) => {
             required
           />
           <Input
-            disabled={false}
+            disabled={pending}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Password"
@@ -50,7 +90,7 @@ export const SignUpCard = ({ setState }: SignUpCardProps) => {
             required
           />
           <Input
-            disabled={false}
+            disabled={pending}
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             placeholder="Confirm password"
@@ -60,7 +100,7 @@ export const SignUpCard = ({ setState }: SignUpCardProps) => {
           <Button
             type="submit"
             size="lg"
-            disabled={false}
+            disabled={pending}
             className="w-full"
           >
             Continue
@@ -69,20 +109,20 @@ export const SignUpCard = ({ setState }: SignUpCardProps) => {
         <Separator />
         <div className="flex flex-col gap-y-2.5">
           <Button
-            onClick={() => {}}
+            onClick={() => handleProviderSignUp('google')}
             variant="outline"
             size="lg"
-            disabled={false}
+            disabled={pending}
             className="relative w-full"
           >
             <FcGoogle className="absolute left-2.5 top-3 size-5" />
             Continue with Google
           </Button>
           <Button
-            onClick={() => {}}
+            onClick={() => handleProviderSignUp('github')}
             variant="outline"
             size="lg"
-            disabled={false}
+            disabled={pending}
             className="relative w-full"
           >
             <FaGithub className="absolute left-2.5 top-3 size-5" />
