@@ -71,6 +71,17 @@ export const getById = query({
       throw new Error('Unauthorized');
     }
 
+    const member = await ctx.db
+      .query('members')
+      .withIndex('by_workspace_id_user_id', (q) =>
+        q.eq('workspaceId', args.id).eq('userId', userId),
+      )
+      .unique();
+
+    if (!member) {
+      return null;
+    }
+
     return await ctx.db.get(args.id);
   },
 });
